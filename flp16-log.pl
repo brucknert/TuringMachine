@@ -39,14 +39,15 @@ parseLine(L,P) :- P = L.
 simulateTS(T, S, Trs, R) :-
     S == 'F', true;
     getTransition(T, S, Trs, Tr),
-    nth0(3, Tr, NS),
-    nth0(4, Tr, A), 
+    nth0(2, Tr, NS),
+    nth0(3, Tr, A), 
     ( A == 'L', shiftLeft(T, S, NT);
       A == 'R', shiftRight(T, S, NT);
       writeSymbol(T, S, A, NT)
     ),
-    simulateTS(NT, NS, Trs, R2),
-    R = [NT|R2].
+    changeState(NT, S, NS, NTT),
+    simulateTS(NTT, NS, Trs, R2),
+    R = [NTT|R2].
 
 % Tape, State, Transitions, Transition
 getTransition(T, S, [H|Trs], Tr) :-
@@ -58,6 +59,8 @@ getTransition(T, S, [H|Trs], Tr) :-
      getTransition(T, S, Trs, Tr)
     ).
 
+changeState(T, S, NS, NT) :-
+    nth0(I, T, S), replace(T, I, NS, NT).
 
 % http://stackoverflow.com/questions/8519203/prolog-replace-an-element-in-a-list-at-a-specified-index
 replace([_|T], 0, X, [X|T]).
@@ -92,8 +95,9 @@ main :-
     last(LP,T),
     delete(LP,T,Trs),
     append(['S'], T, ST),
-    write(ST),
+    !,
     simulateTS(ST, 'S', Trs, R),
+    write(R),
     halt.
 
 
