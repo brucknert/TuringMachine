@@ -37,7 +37,7 @@ parseLine(L,P) :- P = L.
 
 % Tape, State, Transitions, Result
 simulateTS(T, S, Trs, R) :-
-    S == 'F', true;
+    S == 'F', R = [], true;
     getTransition(T, S, Trs, Tr),
     nth0(2, Tr, NS),
     nth0(3, Tr, A), 
@@ -72,21 +72,31 @@ writeSymbol(T, S, A, R) :-
     J is I + 1,
     replace(T, J, A, R).
 
-% check na abnormalni zastaveni
 shiftLeft(T, S, R) :- 
     nth0(I, T, S),
     J is I - 1,
-    nth0(J, T, Tmp),
-    replace(T, J, S, X),
-    replace(X, I, Tmp, R).   
+    (J < 0, writef("Abnormal halt!\n"),halt;
+     nth0(J, T, Tmp),
+     replace(T, J, S, X),
+     replace(X, I, Tmp, R)
+    ).   
+
+writeConfigurations([H|T]) :-
+    writef("%s\n", [H]), writeConfigurations(T).
+writeConfigurations([]).
 
 % check na blank
 shiftRight(T, S, R) :- 
     nth0(I, T, S),
     J is I + 1,
-    nth0(J, T, Tmp),
-    replace(T, J, S, X),
-    replace(X, I, Tmp, R).   
+    length(T, Len),
+    Len2 is Len - 1,
+    (J == Len2, append(T, [' '], TT);
+     TT = T
+    ),
+    nth0(J, TT, Tmp),
+    replace(TT, J, S, X),
+    replace(X, I, Tmp, R).
 
 main :- 
     prompt(_,''),
@@ -97,10 +107,7 @@ main :-
     append(['S'], T, ST),
     !,
     simulateTS(ST, 'S', Trs, R),
-    write(R),
-    halt.
-
-
+    writeConfigurations(R).
 
 % vim: expandtab:shiftwidth=4:tabstop=4:softtabstop=0:textwidth=120
 
