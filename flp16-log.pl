@@ -22,21 +22,19 @@ isEOFEOL(Char) :-
     Char == end_of_file;
     (char_code(Char,Code), Code == 10).
 
-% Parses every lines to tape format or transition format
-parseLines([],[]).
-parseLines([Line|RestLines], [ParsedLine|ParsedLines]) :-
-    parseLines(RestLines,ParsedLines), parseLine(Line,ParsedLine).
+% Parses every lines to transition format
+parseTransitions([],[]).
+parseTransitions([Line|RestLines], [ParsedLine|ParsedLines]) :-
+    parseTransitions(RestLines,ParsedLines), parseTransition(Line,ParsedLine).
 
 % Parses single line
-% tape "symbolsymbolsymbolsymbol"
 % transition "oldstate symbol newstate action"
-parseLine(Line,Parsed) :-
+parseTransition(Line,Parsed) :-
     nth0(0, Line, OldState),
     nth0(2, Line, Symbol),
     nth0(4, Line, NewState),
     nth0(6, Line, Action),
     Parsed = [OldState, Symbol, NewState, Action].
-parseLine(Line,Parsed) :- Parsed = Line.
 
 % Simulates Turing Machine
 simulateTS(Tape, State, Transitions, Output) :-
@@ -54,7 +52,6 @@ simulateTS(Tape, State, Transitions, Output) :-
     Output = [FNewTape|RestOutput].
 
 % Gets transition for current state and symbol on head
-getTransition(_, _, [], []).
 getTransition(Tape, State, [CurrentTransition|Transitions], OutputTransition) :-
     nth0(StateIndex, Tape, State),
     SymbolIndex is StateIndex + 1,
@@ -113,23 +110,27 @@ shiftRight(Tape, State, NewTape) :-
 % Writes configurations after simmulation
 writeConfigurations([]).
 writeConfigurations([Configuration|RestConfigurations]) :-
+    Configuration == [] ;
     writef("%s\n", [Configuration]), writeConfigurations(RestConfigurations).
 
 % Starting point, parses Turing Machine from stdin
-% TS format:
+% TS transition format:
 % <state><space><symbol><space><newstate><space><symbol/L/R>
+% TS tape format:
 % <symbol><symbol><symbol>...
 main :-
     prompt(_,''),
     readLines(Lines),
-    parseLines(Lines, LinesParsed),
-    last(LinesParsed,Tape),
-    delete(LinesParsed,Tape,Transitions),
+    last(Lines, Tape),
+    delete(Lines, Tape, PreparsedTransitions), 
+    parseTransitions(PreparsedTransitions, Transitions),
     append(['S'], Tape, StartingTape),
     !,
     ( simulateTS(StartingTape, 'S', Transitions, Configurations);
-      writef("Abnormal halt!"), halt
+      writef("Abnormal halt!\n"), halt
     ),
-    writeConfigurations(Configurations).
+    append([StartingTape], Configurations, FinalConfigurations),
+    writeConfigurations(FinalConfigurations),
+    halt.
 
 % vim: expandtab:shiftwidth=4:tabstop=4:softtabstop=0:textwidth=120
