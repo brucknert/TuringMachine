@@ -1,10 +1,19 @@
 Program parsuje stdin, kde poslední řádek je počáteční páska, ostatní řádky jsou
 přechodové pravidla Turingova stroje.
 Automat může:
-1 - Normálně zastavit, což vede k vypsání jednotlivých konfigurací, které
-vedou do koncového stavu. 
-2 - Abnormálně zastavit, pokud neexistuje způsob se dostat do koncového stavu.
+1 - Normálně zastavit, což vede k vypsání jednotlivých konfigurací, které vedou
+    do koncového stavu. 
+2 - Abnormálně zastavit, pokud neexistuje způsob se dostat do koncového stavu,
+    což vede k vypsání hlášky "Abnormal halt!".
 3 - Cyklit, což vede ke skončení vyčerpáním paměti.
+
+Odevzdané testovací soubory:
+  test_blank_tape.in
+  test_blank_transition.in
+  test_example.in
+  test_halt_left_shift.in
+  test_halt_no_transition.in 	
+  test_nondeterministic.in
 
 Překlad:
 	gmake
