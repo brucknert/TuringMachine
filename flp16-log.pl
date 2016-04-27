@@ -88,11 +88,10 @@ writeSymbol(Tape, State, Symbol, NewTape) :-
 shiftLeft(Tape, State, NewTape) :-
     nth0(StateIndex, Tape, State),
     NewStateIndex is StateIndex - 1,
-    (NewStateIndex < 0, writef("Abnormal halt!\n"),halt;
-     nth0(NewStateIndex, Tape, Tmp),
-     replace(Tape, NewStateIndex, State, TmpTape),
-     replace(TmpTape, StateIndex, Tmp, NewTape)
-    ).
+    nth0(NewStateIndex, Tape, Tmp),
+    replace(Tape, NewStateIndex, State, TmpTape),
+    replace(TmpTape, StateIndex, Tmp, NewTape)
+    .
 
 % Shifts head to the right
 shiftRight(Tape, State, NewTape) :-
