@@ -54,6 +54,7 @@ simulateTS(Tape, State, Transitions, Output) :-
     Output = [FNewTape|RestOutput].
 
 % Gets transition for current state and symbol on head
+getTransition(_, _, [], []).
 getTransition(Tape, State, [CurrentTransition|Transitions], OutputTransition) :-
     nth0(StateIndex, Tape, State),
     SymbolIndex is StateIndex + 1,
@@ -126,7 +127,9 @@ main :-
     delete(LinesParsed,Tape,Transitions),
     append(['S'], Tape, StartingTape),
     !,
-    simulateTS(StartingTape, 'S', Transitions, Configurations),
+    ( simulateTS(StartingTape, 'S', Transitions, Configurations);
+      writef("Abnormal halt!"), halt
+    ),
     writeConfigurations(Configurations).
 
 % vim: expandtab:shiftwidth=4:tabstop=4:softtabstop=0:textwidth=120
