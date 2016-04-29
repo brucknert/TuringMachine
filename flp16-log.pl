@@ -17,9 +17,7 @@ main :-
     parseTransitions(PreparsedTransitions, Transitions),
     append(['S'], Tape, StartingTape),
     !,
-    ( simulateTS(StartingTape, 'S', Transitions, Configurations);
-      writef("Abnormal halt!\n"), halt
-    ),
+    ids(0, StartingTape, 'S', Transitions, Configurations),
     append([StartingTape], Configurations, FinalConfigurations),
     writeConfigurations(FinalConfigurations),
     halt.
@@ -56,24 +54,38 @@ parseTransition(Line,Parsed) :-
     nth0(6, Line, Action),
     Parsed = [OldState, Symbol, NewState, Action].
 
+% Indicates if we should continue with next iteration of Iterative Depth Search
+:- dynamic continue/0.
+
+% Iterative Depth Search
+ids(Level, Tape, State, Transitions, Output) :- 
+    % Final state found in specified depth
+    simulateTS(Level, Tape, State, Transitions, Output); 
+    % Final state can still be in higher depth
+    continue, retract(continue), NewLevel is Level + 1, ids(NewLevel, Tape, State, Transitions, Output);
+    % There are no valid transitions
+    writef("Abnormal halt!\n"), halt.
+
 % Simulates Turing Machine
-simulateTS(Tape, State, Transitions, Output) :-
-    % final state
-    State == 'F', Output = [];
+simulateTS(0, _, S, _, Output) :- asserta(continue), S == 'F', Output = [], !.
+simulateTS(Level, Tape, State, Transitions, Output) :-
     % not in final state
+    Level > 0,
     getTransition(Tape, State, Transitions, SingleTransition),
     nth0(2, SingleTransition, NewState),
     nth0(3, SingleTransition, Action),
     ( Action == 'L', shiftLeft(Tape, State, NewTape);
       Action == 'R', shiftRight(Tape, State, NewTape);
-      writeSymbol(Tape, State, Action, NewTape)
+      writeSymbol(Tape, State, Action, NewTape) 
     ),
     changeState(NewTape, State, NewState, FNewTape),
-    simulateTS(FNewTape, NewState, Transitions, RestOutput),
+    NewLevel is Level - 1,
+    simulateTS(NewLevel, FNewTape, NewState, Transitions, RestOutput),
     % all configurations
     Output = [FNewTape|RestOutput].
 
 % Gets transition for current state and symbol on head
+getTransition(_, _, [], Output) :- Output = [].
 getTransition(Tape, State, [CurrentTransition|Transitions], OutputTransition) :-
     nth0(StateIndex, Tape, State),
     SymbolIndex is StateIndex + 1,
