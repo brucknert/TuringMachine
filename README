@@ -2,10 +2,12 @@
 % Course:  Funcional and Logical Programming
 % Author:  Tomas Bruckner, xbruck02@stud.fit.vutbr.cz
 % Date:	   2016-04-26
+% Encoding: UTF-8
 %
 
-Program parsuje stdin, kde poslední řádek je počáteční páska, ostatní řádky jsou
-přechodové pravidla Turingova stroje.
+Program načítá stdin, kde poslední řádek je počáteční páska, ostatní řádky jsou
+přechodová pravidla Turingova stroje. Hledání koncového stavu je řešeno pomocí
+iterativního hledání do hloubky.
 Automat může:
 1 - Normálně zastavit, což vede k vypsání jednotlivých konfigurací, které vedou
     do koncového stavu.
@@ -45,6 +47,16 @@ Odevzdané testovací soubory, měřeno na serveru Merlin:
     real    0m0.021s
     user    0m0.016s
     sys     0m0.003s
+
+  test_ids.in
+    real    0m0.019s
+    user    0m0.012s
+    sys     0m0.006s
+
+  test_ids2.in
+    real    0m0.021s
+    user    0m0.014s
+    sys     0m0.004s
 
   test_nondeterministic.in
     real    0m0.061s
