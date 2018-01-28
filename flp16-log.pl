@@ -1,6 +1,6 @@
 % Project: Turing Machine
 % Course:  Funcional and Logical Programming
-% Author:  Tomas Bruckner, xbruck02@stud.fit.vutbr.cz
+% Author:  Tomas Bruckner, tomasbrucknermail@gmail.com
 % Date:	   2016-04-26
 
 
